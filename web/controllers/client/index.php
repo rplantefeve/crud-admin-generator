@@ -16,7 +16,7 @@ require_once __DIR__.'/../../../src/app.php';
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-$app->match('/__TABLENAME__/list', function (Symfony\Component\HttpFoundation\Request $request) use ($app) {  
+$app->match('/client/list', function (Symfony\Component\HttpFoundation\Request $request) use ($app) {  
     $start = 0;
     $vars = $request->query->all();
     $qsStart = (int)$vars["start"];
@@ -43,7 +43,12 @@ $app->match('/__TABLENAME__/list', function (Symfony\Component\HttpFoundation\Re
     }
     
     $table_columns = array(
-__TABLECOLUMNS_ARRAY__
+		'clientId', 
+		'denomination', 
+		'adresse', 
+		'codePostal', 
+		'ville', 
+
     );
     
     $whereClause = "";
@@ -64,15 +69,16 @@ __TABLECOLUMNS_ARRAY__
         $i = $i + 1;
     }
     
-    $recordsTotal = $app['db']->executeQuery("SELECT * FROM `__TABLENAME__`" . $whereClause . $orderClause)->rowCount();
+    $recordsTotal = $app['db']->executeQuery("SELECT * FROM `client`" . $whereClause . $orderClause)->rowCount();
     
-    $find_sql = "SELECT * FROM `__TABLENAME__`". $whereClause . $orderClause . " LIMIT ". $index . "," . $rowsPerPage;
+    $find_sql = "SELECT * FROM `client`". $whereClause . $orderClause . " LIMIT ". $index . "," . $rowsPerPage;
     $rows_sql = $app['db']->fetchAll($find_sql, array());
 
     foreach($rows_sql as $row_key => $row_sql){
         for($i = 0; $i < count($table_columns); $i++){
 
-__EXTERNALS_FOR_LIST__
+		$rows[$row_key][$table_columns[$i]] = $row_sql[$table_columns[$i]];
+
 
         }
     }    
@@ -86,35 +92,48 @@ __EXTERNALS_FOR_LIST__
     return new Symfony\Component\HttpFoundation\Response(json_encode($queryData), 200);
 });
 
-$app->match('/__TABLENAME__', function () use ($app) {
+$app->match('/client', function () use ($app) {
     
 	$table_columns = array(
-__TABLECOLUMNS_ARRAY__
+		'clientId', 
+		'denomination', 
+		'adresse', 
+		'codePostal', 
+		'ville', 
+
     );
 
-    $primary_key = "__TABLE_PRIMARYKEY__";	
+    $primary_key = "clientId";	
 
-    return $app['twig']->render('__TABLENAME__/list.html.twig', array(
+    return $app['twig']->render('client/list.html.twig', array(
     	"table_columns" => $table_columns,
         "primary_key" => $primary_key
     ));
         
 })
-->bind('__TABLENAME___list');
+->bind('client_list');
 
 
 
-$app->match('/__TABLENAME__/create', function () use ($app) {
+$app->match('/client/create', function () use ($app) {
     
     $initial_data = array(
-__TABLECOLUMNS_INITIALDATA_EMPTY_ARRAY__
+		'denomination' => '', 
+		'adresse' => '', 
+		'codePostal' => '', 
+		'ville' => '', 
+
     );
 
     $form = $app['form.factory']->createBuilder('form', $initial_data);
 
-__EXTERNALSFIELDS_FOR_FORM__
 
-__FIELDS_FOR_FORM__
+
+	$form = $form->add('denomination', 'text', array('required' => true));
+	$form = $form->add('adresse', 'text', array('required' => true));
+	$form = $form->add('codePostal', 'text', array('required' => true));
+	$form = $form->add('ville', 'text', array('required' => true));
+
 
     $form = $form->getForm();
 
@@ -125,33 +144,33 @@ __FIELDS_FOR_FORM__
         if ($form->isValid()) {
             $data = $form->getData();
 
-            $update_query = "INSERT INTO `__TABLENAME__` (__INSERT_QUERY_FIELDS__) VALUES (__INSERT_QUERY_VALUES__)";
-            $app['db']->executeUpdate($update_query, array(__INSERT_EXECUTE_FIELDS__));            
+            $update_query = "INSERT INTO `client` (`denomination`, `adresse`, `codePostal`, `ville`) VALUES (?, ?, ?, ?)";
+            $app['db']->executeUpdate($update_query, array($data['denomination'], $data['adresse'], $data['codePostal'], $data['ville']));            
 
 
             $app['session']->getFlashBag()->add(
                 'success',
                 array(
-                    'message' => '__TABLENAME__ créé(e) !',
+                    'message' => 'client créé(e) !',
                 )
             );
-            return $app->redirect($app['url_generator']->generate('__TABLENAME___list'));
+            return $app->redirect($app['url_generator']->generate('client_list'));
 
         }
     }
 
-    return $app['twig']->render('__TABLENAME__/create.html.twig', array(
+    return $app['twig']->render('client/create.html.twig', array(
         "form" => $form->createView()
     ));
         
 })
-->bind('__TABLENAME___create');
+->bind('client_create');
 
 
 
-$app->match('/__TABLENAME__/edit/{id}', function ($id) use ($app) {
+$app->match('/client/edit/{id}', function ($id) use ($app) {
 
-    $find_sql = "SELECT * FROM `__TABLENAME__` WHERE `__TABLE_PRIMARYKEY__` = ?";
+    $find_sql = "SELECT * FROM `client` WHERE `clientId` = ?";
     $row_sql = $app['db']->fetchAssoc($find_sql, array($id));
 
     if(!$row_sql){
@@ -161,19 +180,27 @@ $app->match('/__TABLENAME__/edit/{id}', function ($id) use ($app) {
                 'message' => 'Enregistrement non trouvé !',
             )
         );        
-        return $app->redirect($app['url_generator']->generate('__TABLENAME___list'));
+        return $app->redirect($app['url_generator']->generate('client_list'));
     }
 
     
     $initial_data = array(
-__TABLECOLUMNS_INITIALDATA_ARRAY__
+		'denomination' => $row_sql['denomination'], 
+		'adresse' => $row_sql['adresse'], 
+		'codePostal' => $row_sql['codePostal'], 
+		'ville' => $row_sql['ville'], 
+
     );
 
 
     $form = $app['form.factory']->createBuilder('form', $initial_data);
 
-__EXTERNALSFIELDS_FOR_FORM__
-__FIELDS_FOR_FORM__
+
+	$form = $form->add('denomination', 'text', array('required' => true));
+	$form = $form->add('adresse', 'text', array('required' => true));
+	$form = $form->add('codePostal', 'text', array('required' => true));
+	$form = $form->add('ville', 'text', array('required' => true));
+
 
     $form = $form->getForm();
 
@@ -184,44 +211,44 @@ __FIELDS_FOR_FORM__
         if ($form->isValid()) {
             $data = $form->getData();
 
-            $update_query = "UPDATE `__TABLENAME__` SET __UPDATE_QUERY_FIELDS__ WHERE `__TABLE_PRIMARYKEY__` = ?";
-            $app['db']->executeUpdate($update_query, array(__UPDATE_EXECUTE_FIELDS__, $id));            
+            $update_query = "UPDATE `client` SET `denomination` = ?, `adresse` = ?, `codePostal` = ?, `ville` = ? WHERE `clientId` = ?";
+            $app['db']->executeUpdate($update_query, array($data['denomination'], $data['adresse'], $data['codePostal'], $data['ville'], $id));            
 
 
             $app['session']->getFlashBag()->add(
                 'success',
                 array(
-                    'message' => '__TABLENAME__ modifié(e) !',
+                    'message' => 'client modifié(e) !',
                 )
             );
-            return $app->redirect($app['url_generator']->generate('__TABLENAME___edit', array("id" => $id)));
+            return $app->redirect($app['url_generator']->generate('client_edit', array("id" => $id)));
 
         }
     }
 
-    return $app['twig']->render('__TABLENAME__/edit.html.twig', array(
+    return $app['twig']->render('client/edit.html.twig', array(
         "form" => $form->createView(),
         "id" => $id
     ));
         
 })
-->bind('__TABLENAME___edit');
+->bind('client_edit');
 
 
 
-$app->match('/__TABLENAME__/delete/{id}', function ($id) use ($app) {
+$app->match('/client/delete/{id}', function ($id) use ($app) {
 
-    $find_sql = "SELECT * FROM `__TABLENAME__` WHERE `__TABLE_PRIMARYKEY__` = ?";
+    $find_sql = "SELECT * FROM `client` WHERE `clientId` = ?";
     $row_sql = $app['db']->fetchAssoc($find_sql, array($id));
 
     if($row_sql){
-        $delete_query = "DELETE FROM `__TABLENAME__` WHERE `__TABLE_PRIMARYKEY__` = ?";
+        $delete_query = "DELETE FROM `client` WHERE `clientId` = ?";
         $app['db']->executeUpdate($delete_query, array($id));
 
         $app['session']->getFlashBag()->add(
             'success',
             array(
-                'message' => '__TABLENAME__ supprimé(e) !',
+                'message' => 'client supprimé(e) !',
             )
         );
     }
@@ -234,10 +261,10 @@ $app->match('/__TABLENAME__/delete/{id}', function ($id) use ($app) {
         );  
     }
 
-    return $app->redirect($app['url_generator']->generate('__TABLENAME___list'));
+    return $app->redirect($app['url_generator']->generate('client_list'));
 
 })
-->bind('__TABLENAME___delete');
+->bind('client_delete');
 
 
 

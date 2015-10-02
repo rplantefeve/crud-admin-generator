@@ -4,14 +4,14 @@
 
     <div class="wrapper row-offcanvas row-offcanvas-left">
 
-        {% include 'menu.html.twig' with {'option': '__TABLENAME___create'} %}
+        {% include 'menu.html.twig' with {'option': 'facture_create'} %}
 
         <!-- Right side column. Contains the navbar and content of the page -->
         <aside class="right-side">                
             <!-- Content Header (Page header) -->
             <section class="content-header">
                 <h1>
-                    Cr&eacute;er __TABLENAMEUP__
+                    Cr&eacute;er Facture
                 </h1>
             </section>
 
@@ -32,7 +32,22 @@
                                 </div><!-- /.box-header -->
                                 <div class="box-body">
 
-__EDIT_FORM_TEMPLATE__                                                  
+									<div class='form-group'>
+									    {{ form_label(form.factureId) }}
+									    {{ form_widget(form.factureId, { attr: { 'class': 'form-control' }}) }}
+									</div>
+
+									<div class='form-group'>
+									    {{ form_label(form.date) }}
+									    {{ form_widget(form.date, { attr: { 'class': 'form-control' }}) }}
+									</div>
+
+									<div class='form-group'>
+									    {{ form_label(form.client_id) }}
+									    {{ form_widget(form.client_id, { attr: { 'class': 'form-control' }}) }}
+									</div>
+
+                                                  
 
                                 </div><!-- /.box-body -->
 

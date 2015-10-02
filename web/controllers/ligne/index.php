@@ -16,7 +16,7 @@ require_once __DIR__.'/../../../src/app.php';
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-$app->match('/__TABLENAME__/list', function (Symfony\Component\HttpFoundation\Request $request) use ($app) {  
+$app->match('/ligne/list', function (Symfony\Component\HttpFoundation\Request $request) use ($app) {  
     $start = 0;
     $vars = $request->query->all();
     $qsStart = (int)$vars["start"];
@@ -43,7 +43,13 @@ $app->match('/__TABLENAME__/list', function (Symfony\Component\HttpFoundation\Re
     }
     
     $table_columns = array(
-__TABLECOLUMNS_ARRAY__
+		'ligneId', 
+		'qte', 
+		'nature', 
+		'description', 
+		'prixUnitaire', 
+		'facture_factureId', 
+
     );
     
     $whereClause = "";
@@ -64,15 +70,16 @@ __TABLECOLUMNS_ARRAY__
         $i = $i + 1;
     }
     
-    $recordsTotal = $app['db']->executeQuery("SELECT * FROM `__TABLENAME__`" . $whereClause . $orderClause)->rowCount();
+    $recordsTotal = $app['db']->executeQuery("SELECT * FROM `ligne`" . $whereClause . $orderClause)->rowCount();
     
-    $find_sql = "SELECT * FROM `__TABLENAME__`". $whereClause . $orderClause . " LIMIT ". $index . "," . $rowsPerPage;
+    $find_sql = "SELECT * FROM `ligne`". $whereClause . $orderClause . " LIMIT ". $index . "," . $rowsPerPage;
     $rows_sql = $app['db']->fetchAll($find_sql, array());
 
     foreach($rows_sql as $row_key => $row_sql){
         for($i = 0; $i < count($table_columns); $i++){
 
-__EXTERNALS_FOR_LIST__
+		$rows[$row_key][$table_columns[$i]] = $row_sql[$table_columns[$i]];
+
 
         }
     }    
@@ -86,35 +93,51 @@ __EXTERNALS_FOR_LIST__
     return new Symfony\Component\HttpFoundation\Response(json_encode($queryData), 200);
 });
 
-$app->match('/__TABLENAME__', function () use ($app) {
+$app->match('/ligne', function () use ($app) {
     
 	$table_columns = array(
-__TABLECOLUMNS_ARRAY__
+		'ligneId', 
+		'qte', 
+		'nature', 
+		'description', 
+		'prixUnitaire', 
+		'facture_factureId', 
+
     );
 
-    $primary_key = "__TABLE_PRIMARYKEY__";	
+    $primary_key = "ligneId";	
 
-    return $app['twig']->render('__TABLENAME__/list.html.twig', array(
+    return $app['twig']->render('ligne/list.html.twig', array(
     	"table_columns" => $table_columns,
         "primary_key" => $primary_key
     ));
         
 })
-->bind('__TABLENAME___list');
+->bind('ligne_list');
 
 
 
-$app->match('/__TABLENAME__/create', function () use ($app) {
+$app->match('/ligne/create', function () use ($app) {
     
     $initial_data = array(
-__TABLECOLUMNS_INITIALDATA_EMPTY_ARRAY__
+		'qte' => '', 
+		'nature' => '', 
+		'description' => '', 
+		'prixUnitaire' => '', 
+		'facture_factureId' => '', 
+
     );
 
     $form = $app['form.factory']->createBuilder('form', $initial_data);
 
-__EXTERNALSFIELDS_FOR_FORM__
 
-__FIELDS_FOR_FORM__
+
+	$form = $form->add('qte', 'text', array('required' => true));
+	$form = $form->add('nature', 'text', array('required' => true));
+	$form = $form->add('description', 'textarea', array('required' => true));
+	$form = $form->add('prixUnitaire', 'text', array('required' => true));
+	$form = $form->add('facture_factureId', 'text', array('required' => true));
+
 
     $form = $form->getForm();
 
@@ -125,33 +148,33 @@ __FIELDS_FOR_FORM__
         if ($form->isValid()) {
             $data = $form->getData();
 
-            $update_query = "INSERT INTO `__TABLENAME__` (__INSERT_QUERY_FIELDS__) VALUES (__INSERT_QUERY_VALUES__)";
-            $app['db']->executeUpdate($update_query, array(__INSERT_EXECUTE_FIELDS__));            
+            $update_query = "INSERT INTO `ligne` (`qte`, `nature`, `description`, `prixUnitaire`, `facture_factureId`) VALUES (?, ?, ?, ?, ?)";
+            $app['db']->executeUpdate($update_query, array($data['qte'], $data['nature'], $data['description'], $data['prixUnitaire'], $data['facture_factureId']));            
 
 
             $app['session']->getFlashBag()->add(
                 'success',
                 array(
-                    'message' => '__TABLENAME__ créé(e) !',
+                    'message' => 'ligne créé(e) !',
                 )
             );
-            return $app->redirect($app['url_generator']->generate('__TABLENAME___list'));
+            return $app->redirect($app['url_generator']->generate('ligne_list'));
 
         }
     }
 
-    return $app['twig']->render('__TABLENAME__/create.html.twig', array(
+    return $app['twig']->render('ligne/create.html.twig', array(
         "form" => $form->createView()
     ));
         
 })
-->bind('__TABLENAME___create');
+->bind('ligne_create');
 
 
 
-$app->match('/__TABLENAME__/edit/{id}', function ($id) use ($app) {
+$app->match('/ligne/edit/{id}', function ($id) use ($app) {
 
-    $find_sql = "SELECT * FROM `__TABLENAME__` WHERE `__TABLE_PRIMARYKEY__` = ?";
+    $find_sql = "SELECT * FROM `ligne` WHERE `ligneId` = ?";
     $row_sql = $app['db']->fetchAssoc($find_sql, array($id));
 
     if(!$row_sql){
@@ -161,19 +184,29 @@ $app->match('/__TABLENAME__/edit/{id}', function ($id) use ($app) {
                 'message' => 'Enregistrement non trouvé !',
             )
         );        
-        return $app->redirect($app['url_generator']->generate('__TABLENAME___list'));
+        return $app->redirect($app['url_generator']->generate('ligne_list'));
     }
 
     
     $initial_data = array(
-__TABLECOLUMNS_INITIALDATA_ARRAY__
+		'qte' => $row_sql['qte'], 
+		'nature' => $row_sql['nature'], 
+		'description' => $row_sql['description'], 
+		'prixUnitaire' => $row_sql['prixUnitaire'], 
+		'facture_factureId' => $row_sql['facture_factureId'], 
+
     );
 
 
     $form = $app['form.factory']->createBuilder('form', $initial_data);
 
-__EXTERNALSFIELDS_FOR_FORM__
-__FIELDS_FOR_FORM__
+
+	$form = $form->add('qte', 'text', array('required' => true));
+	$form = $form->add('nature', 'text', array('required' => true));
+	$form = $form->add('description', 'textarea', array('required' => true));
+	$form = $form->add('prixUnitaire', 'text', array('required' => true));
+	$form = $form->add('facture_factureId', 'text', array('required' => true));
+
 
     $form = $form->getForm();
 
@@ -184,44 +217,44 @@ __FIELDS_FOR_FORM__
         if ($form->isValid()) {
             $data = $form->getData();
 
-            $update_query = "UPDATE `__TABLENAME__` SET __UPDATE_QUERY_FIELDS__ WHERE `__TABLE_PRIMARYKEY__` = ?";
-            $app['db']->executeUpdate($update_query, array(__UPDATE_EXECUTE_FIELDS__, $id));            
+            $update_query = "UPDATE `ligne` SET `qte` = ?, `nature` = ?, `description` = ?, `prixUnitaire` = ?, `facture_factureId` = ? WHERE `ligneId` = ?";
+            $app['db']->executeUpdate($update_query, array($data['qte'], $data['nature'], $data['description'], $data['prixUnitaire'], $data['facture_factureId'], $id));            
 
 
             $app['session']->getFlashBag()->add(
                 'success',
                 array(
-                    'message' => '__TABLENAME__ modifié(e) !',
+                    'message' => 'ligne modifié(e) !',
                 )
             );
-            return $app->redirect($app['url_generator']->generate('__TABLENAME___edit', array("id" => $id)));
+            return $app->redirect($app['url_generator']->generate('ligne_edit', array("id" => $id)));
 
         }
     }
 
-    return $app['twig']->render('__TABLENAME__/edit.html.twig', array(
+    return $app['twig']->render('ligne/edit.html.twig', array(
         "form" => $form->createView(),
         "id" => $id
     ));
         
 })
-->bind('__TABLENAME___edit');
+->bind('ligne_edit');
 
 
 
-$app->match('/__TABLENAME__/delete/{id}', function ($id) use ($app) {
+$app->match('/ligne/delete/{id}', function ($id) use ($app) {
 
-    $find_sql = "SELECT * FROM `__TABLENAME__` WHERE `__TABLE_PRIMARYKEY__` = ?";
+    $find_sql = "SELECT * FROM `ligne` WHERE `ligneId` = ?";
     $row_sql = $app['db']->fetchAssoc($find_sql, array($id));
 
     if($row_sql){
-        $delete_query = "DELETE FROM `__TABLENAME__` WHERE `__TABLE_PRIMARYKEY__` = ?";
+        $delete_query = "DELETE FROM `ligne` WHERE `ligneId` = ?";
         $app['db']->executeUpdate($delete_query, array($id));
 
         $app['session']->getFlashBag()->add(
             'success',
             array(
-                'message' => '__TABLENAME__ supprimé(e) !',
+                'message' => 'ligne supprimé(e) !',
             )
         );
     }
@@ -234,10 +267,10 @@ $app->match('/__TABLENAME__/delete/{id}', function ($id) use ($app) {
         );  
     }
 
-    return $app->redirect($app['url_generator']->generate('__TABLENAME___list'));
+    return $app->redirect($app['url_generator']->generate('ligne_list'));
 
 })
-->bind('__TABLENAME___delete');
+->bind('ligne_delete');
 
 
 

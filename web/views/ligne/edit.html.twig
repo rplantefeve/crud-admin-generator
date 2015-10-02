@@ -4,14 +4,14 @@
 
     <div class="wrapper row-offcanvas row-offcanvas-left">
 
-        {% include 'menu.html.twig' with {'option': '__TABLENAME___create'} %}
+        {% include 'menu.html.twig' with {'option': 'ligne_edit'} %}
 
         <!-- Right side column. Contains the navbar and content of the page -->
         <aside class="right-side">                
             <!-- Content Header (Page header) -->
             <section class="content-header">
                 <h1>
-                    Cr&eacute;er __TABLENAMEUP__
+                    Modifier Ligne {{ id }}
                 </h1>
             </section>
 
@@ -32,14 +32,39 @@
                                 </div><!-- /.box-header -->
                                 <div class="box-body">
 
-__EDIT_FORM_TEMPLATE__                                                  
+									<div class='form-group'>
+									    {{ form_label(form.qte) }}
+									    {{ form_widget(form.qte, { attr: { 'class': 'form-control' }}) }}
+									</div>
+
+									<div class='form-group'>
+									    {{ form_label(form.nature) }}
+									    {{ form_widget(form.nature, { attr: { 'class': 'form-control' }}) }}
+									</div>
+
+									<div class='form-group'>
+									    {{ form_label(form.description) }}
+									    {{ form_widget(form.description, { attr: { 'class': 'form-control textarea', 'style': 'width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;' }}) }}
+									</div>
+
+									<div class='form-group'>
+									    {{ form_label(form.prixUnitaire) }}
+									    {{ form_widget(form.prixUnitaire, { attr: { 'class': 'form-control' }}) }}
+									</div>
+
+									<div class='form-group'>
+									    {{ form_label(form.facture_factureId) }}
+									    {{ form_widget(form.facture_factureId, { attr: { 'class': 'form-control' }}) }}
+									</div>
+
+                                                 
 
                                 </div><!-- /.box-body -->
 
                                 {{ form_rest(form) }}
 
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-primary">Créer</button>
+                                    <button type="submit" class="btn btn-primary">Modifier</button>
                                 </div>
 
                             </div><!-- /.box -->

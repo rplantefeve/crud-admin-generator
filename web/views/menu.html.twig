@@ -1,4 +1,43 @@
 {% extends 'ag_menu.html.twig' %}
 
 {% block menu %}
+
+<li class="treeview {% if option is defined and (option == 'client_list' or option == 'client_create' or option == 'client_edit') %}active{% endif %}">
+    <a href="#">
+        <i class="fa fa-folder-o"></i>
+        <span>Client</span>
+        <i class="fa pull-right fa-angle-right"></i>
+    </a>
+    <ul class="treeview-menu" style="display: none;">
+        <li {% if option is defined and option == 'client_list' %}class="active"{% endif %}><a href="{{ path('client_list') }}" style="margin-left: 10px;"><i class="fa fa-angle-double-right"></i> Liste</a></li>
+        <li {% if option is defined and option == 'client_create' %}class="active"{% endif %}><a href="{{ path('client_create') }}" style="margin-left: 10px;"><i class="fa fa-angle-double-right"></i> Créer</a></li>
+    </ul>
+</li>
+
+<li class="treeview {% if option is defined and (option == 'facture_list' or option == 'facture_create' or option == 'facture_edit') %}active{% endif %}">
+    <a href="#">
+        <i class="fa fa-folder-o"></i>
+        <span>Facture</span>
+        <i class="fa pull-right fa-angle-right"></i>
+    </a>
+    <ul class="treeview-menu" style="display: none;">
+        <li {% if option is defined and option == 'facture_list' %}class="active"{% endif %}><a href="{{ path('facture_list') }}" style="margin-left: 10px;"><i class="fa fa-angle-double-right"></i> Liste</a></li>
+        <li {% if option is defined and option == 'facture_create' %}class="active"{% endif %}><a href="{{ path('facture_create') }}" style="margin-left: 10px;"><i class="fa fa-angle-double-right"></i> Créer</a></li>
+    </ul>
+</li>
+
+<li class="treeview {% if option is defined and (option == 'ligne_list' or option == 'ligne_create' or option == 'ligne_edit') %}active{% endif %}">
+    <a href="#">
+        <i class="fa fa-folder-o"></i>
+        <span>Ligne</span>
+        <i class="fa pull-right fa-angle-right"></i>
+    </a>
+    <ul class="treeview-menu" style="display: none;">
+        <li {% if option is defined and option == 'ligne_list' %}class="active"{% endif %}><a href="{{ path('ligne_list') }}" style="margin-left: 10px;"><i class="fa fa-angle-double-right"></i> Liste</a></li>
+        <li {% if option is defined and option == 'ligne_create' %}class="active"{% endif %}><a href="{{ path('ligne_create') }}" style="margin-left: 10px;"><i class="fa fa-angle-double-right"></i> Créer</a></li>
+    </ul>
+</li>
+
+
+
 {% endblock %}

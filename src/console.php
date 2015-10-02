@@ -153,12 +153,12 @@ $console
 			"<li class=\"treeview {% if option is defined and (option == '" . $TABLENAME . "_list' or option == '" . $TABLENAME . "_create' or option == '" . $TABLENAME . "_edit') %}active{% endif %}\">" . "\n" .
 			"    <a href=\"#\">" . "\n" .
 			"        <i class=\"fa fa-folder-o\"></i>" . "\n" .
-			"        <span>" . $TABLENAME . "</span>" . "\n" .
+			"        <span>" . ucfirst($TABLENAME) . "</span>" . "\n" .
 			"        <i class=\"fa pull-right fa-angle-right\"></i>" . "\n" .
 			"    </a>" . "\n" .
 			"    <ul class=\"treeview-menu\" style=\"display: none;\">" . "\n" .
-			"        <li {% if option is defined and option == '" . $TABLENAME . "_list' %}class=\"active\"{% endif %}><a href=\"{{ path('" . $TABLENAME . "_list') }}\" style=\"margin-left: 10px;\"><i class=\"fa fa-angle-double-right\"></i> List</a></li>" . "\n" .
-			"        <li {% if option is defined and option == '" . $TABLENAME . "_create' %}class=\"active\"{% endif %}><a href=\"{{ path('" . $TABLENAME . "_create') }}\" style=\"margin-left: 10px;\"><i class=\"fa fa-angle-double-right\"></i> Create</a></li>" . "\n" .
+			"        <li {% if option is defined and option == '" . $TABLENAME . "_list' %}class=\"active\"{% endif %}><a href=\"{{ path('" . $TABLENAME . "_list') }}\" style=\"margin-left: 10px;\"><i class=\"fa fa-angle-double-right\"></i> Liste</a></li>" . "\n" .
+			"        <li {% if option is defined and option == '" . $TABLENAME . "_create' %}class=\"active\"{% endif %}><a href=\"{{ path('" . $TABLENAME . "_create') }}\" style=\"margin-left: 10px;\"><i class=\"fa fa-angle-double-right\"></i> Créer</a></li>" . "\n" .
 			"    </ul>" . "\n" .
 			"</li>" . "\n\n";
 
@@ -199,7 +199,7 @@ $console
 
 					$external_primary_key = $external_table['primary_key'];
 					$external_select_field = false;
-					$search_names_foreigner_key = array('name','title','e?mail','username');
+					$search_names_foreigner_key = array('name','title','e?mail','username','denomination','nom');
 
 					if(!empty($app['usr_search_names_foreigner_key'])){
 						$search_names_foreigner_key = array_merge(
